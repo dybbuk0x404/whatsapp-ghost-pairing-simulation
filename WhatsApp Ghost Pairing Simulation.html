@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scam Alert: Ghost Pairing Attack Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .whatsapp-bg { background-color: #075E54; }
+        .whatsapp-chat-bg { background-color: #e5ddd5; }
+        .bubble-in { background-color: #ffffff; border-radius: 0 8px 8px 8px; }
+        .iphone-frame {
+            border: 12px solid #222;
+            border-radius: 36px;
+            max-width: 320px;
+            height: 600px;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+        .monitor-frame {
+            border: 10px solid #333;
+            border-radius: 8px;
+            background: #1a1a1a;
+        }
+        .pulsing {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+    <!-- Header Section -->
+    <header class="py-10 text-center px-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 mb-4">
+            Ghost Pairing Attack Simulation
+        </h1>
+        <p class="text-slate-400 max-w-2xl mx-auto italic">
+            "Cybersecurity is not just about tools; it's about human psychology." 
+            <br><span class="text-red-400 font-bold">Educational Demo: For Awareness Only.</span>
+        </p>
+    </header>
+
+    <main class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 p-4">
+        
+        <!-- Left: Victim Interface (Mobile Simulation) -->
+        <div class="flex flex-col items-center">
+            <h3 class="text-xl font-bold mb-4 text-green-400">1. The Victim's Screen</h3>
+            <div class="iphone-frame shadow-2xl shadow-green-500/20">
+                <!-- WhatsApp Header -->
+                <div class="whatsapp-bg p-3 flex items-center text-white text-sm">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full mr-3"></div>
+                    <div>
+                        <p class="font-bold">John (Colleague)</p>
+                        <p class="text-xs opacity-80">online</p>
+                    </div>
+                </div>
+                
+                <!-- Chat Window -->
+                <div id="app-screen" class="whatsapp-chat-bg h-full p-4 overflow-y-auto">
+                    <!-- Message 1 -->
+                    <div class="bubble-in p-2 mb-4 text-sm text-slate-800 shadow-sm max-w-[80%]">
+                        Hey! I was browsing this old Facebook archive and I found a photo of you from 2018! Check this out:
+                    </div>
+                    <!-- Phishing Link -->
+                    <div class="bubble-in p-2 mb-4 text-sm text-blue-600 shadow-sm max-w-[80%] underline cursor-pointer" id="scam-link">
+                        https://facebook-secure-archive.net/view/photo_8829
+                    </div>
+                    
+                    <!-- Fake Landing Page (Initially Hidden) -->
+                    <div id="fake-landing" class="hidden absolute inset-0 bg-white z-20 flex flex-col p-6 animate-fadeIn">
+                        <div class="text-blue-700 font-bold text-2xl mb-8">facebook</div>
+                        <p class="text-slate-800 font-semibold mb-2">Identify Verification Required</p>
+                        <p class="text-slate-500 text-xs mb-6">To view the private content, verify your identity via your linked WhatsApp device.</p>
+                        
+                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
+                            <p class="text-slate-800 text-sm mb-4">Enter the 8-character code shown on your WhatsApp "Link a Device" screen:</p>
+                            <input type="text" id="pairing-code-input" maxlength="8" placeholder="A1B2-C3D4" class="w-full border-2 border-blue-500 p-2 rounded text-center text-slate-800 font-mono tracking-widest uppercase">
+                            <button id="submit-code" class="mt-4 w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 transition">Confirm Identity</button>
+                        </div>
+                        <p class="mt-4 text-[10px] text-slate-400 italic">Facebook will never ask for your password. This is a secure pairing method.</p>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-6 text-sm text-slate-400 text-center">Step 1: Click the link in the chat.<br>Step 2: Enter any 8 characters in the fake "verification" box.</p>
+        </div>
+
+        <!-- Right: Attacker Dashboard / Analytics -->
+        <div class="space-y-6">
+            <h3 class="text-xl font-bold text-red-400">2. Attacker's Control Panel</h3>
+            <div class="monitor-frame p-6 shadow-2xl">
+                <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+                    <span class="text-xs font-mono text-red-500">SESSION: ACTIVE_INTERCEPT</span>
+                    <span id="status-badge" class="px-2 py-1 bg-slate-800 text-[10px] rounded text-slate-400">AWAITING TARGET</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-800 p-3 rounded border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Victim IP</p>
+                        <p id="victim-ip" class="text-sm font-mono text-slate-300">---.---.---.---</p>
+                    </div>
+                    <div class="bg-slate-800 p-3 rounded border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Device Link Status</p>
+                        <p id="link-status" class="text-sm font-mono text-red-400">Disconnected</p>
+                    </div>
+                </div>
+
+                <div class="bg-black p-4 rounded font-mono text-xs text-green-500 h-40 overflow-y-auto" id="console-logs">
+                    <p>> Server listening on port 443...</p>
+                    <p>> Awaiting socket connection from fake-link...</p>
+                </div>
+
+                <div class="mt-6 p-4 bg-red-900/20 border border-red-500/50 rounded-lg">
+                    <h4 class="text-red-400 font-bold text-sm mb-2 uppercase tracking-wider">How the Hack Works</h4>
+                    <ul class="text-xs text-slate-300 space-y-2 list-disc ml-4">
+                        <li><strong>Social Engineering:</strong> The attacker uses trust (a "friend") to bypass suspicion.</li>
+                        <li><strong>The "Ghost" Step:</strong> The attacker goes to WhatsApp Web, enters the victim's phone number, and clicks "Link with phone number."</li>
+                        <li><strong>The Intercept:</strong> WhatsApp generates an 8-digit code. The attacker displays a fake box to the victim to "verify identity."</li>
+                        <li><strong>Takeover:</strong> Once the victim enters that code into the fake site, the attacker's browser is now <strong>Linked</strong> to the victim's WhatsApp.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Awareness Card -->
+            <div class="bg-blue-900/20 border border-blue-500/50 p-6 rounded-xl">
+                <h3 class="text-blue-400 font-bold mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    How to Stay Safe
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="flex items-start">
+                        <div class="bg-blue-500 text-white p-1 rounded mr-2">1</div>
+                        <p><strong>Never share pairing codes.</strong> WhatsApp codes are for linking *your* own devices only.</p>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-blue-500 text-white p-1 rounded mr-2">2</div>
+                        <p><strong>Enable 2FA.</strong> Go to Settings > Account > Two-step verification.</p>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-blue-500 text-white p-1 rounded mr-2">3</div>
+                        <p><strong>Verify Links.</strong> Hover over links. Facebook links will never end in .net or .archive.</p>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-blue-500 text-white p-1 rounded mr-2">4</div>
+                        <p><strong>Voice Check.</strong> If a friend sends a weird link, call them to confirm it's actually them.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const scamLink = document.getElementById('scam-link');
+        const fakeLanding = document.getElementById('fake-landing');
+        const consoleLogs = document.getElementById('console-logs');
+        const victimIpDisplay = document.getElementById('victim-ip');
+        const statusBadge = document.getElementById('status-badge');
+        const linkStatus = document.getElementById('link-status');
+        const pairingInput = document.getElementById('pairing-code-input');
+        const submitBtn = document.getElementById('submit-code');
+
+        function addLog(msg, color = 'green-500') {
+            const p = document.createElement('p');
+            p.className = `text-${color}`;
+            const time = new Date().toLocaleTimeString();
+            p.innerHTML = `> [${time}] ${msg}`;
+            consoleLogs.appendChild(p);
+            consoleLogs.scrollTop = consoleLogs.scrollHeight;
+        }
+
+        scamLink.addEventListener('click', () => {
+            fakeLanding.classList.remove('hidden');
+            victimIpDisplay.innerText = '172.56.21.94'; // Mock IP
+            statusBadge.innerText = 'TARGET_ON_SITE';
+            statusBadge.className = 'px-2 py-1 bg-yellow-900 text-[10px] rounded text-yellow-400';
+            addLog('Victim clicked link. User-Agent: iPhone iOS 17.1', 'yellow-400');
+            addLog('Serving fake social verification page...', 'blue-400');
+        });
+
+        submitBtn.addEventListener('click', () => {
+            const code = pairingInput.value;
+            if (code.length < 4) return;
+
+            addLog(`GHOST CODE CAPTURED: [${code.toUpperCase()}]`, 'red-500 font-bold');
+            addLog('Attempting handshake with WhatsApp Web API...', 'yellow-400');
+            
+            setTimeout(() => {
+                addLog('SUCCESS: Pairing complete. Account session cloned.', 'red-500 underline');
+                addLog('Accessing Contacts, Chats, and Media...', 'white');
+                
+                linkStatus.innerText = 'CONNECTED (Cloned)';
+                linkStatus.className = 'text-sm font-mono text-green-400 font-bold pulsing';
+                statusBadge.innerText = 'BREACH_SUCCESSFUL';
+                statusBadge.className = 'px-2 py-1 bg-red-900 text-[10px] rounded text-red-200';
+                
+                // Show success to victim (to finish the illusion)
+                fakeLanding.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center p-4">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-10 h-10 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">Identity Verified</h2>
+                        <p class="text-sm text-slate-500 mt-2">Redirecting you to the photo archive...</p>
+                    </div>
+                `;
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
